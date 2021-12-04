@@ -82,7 +82,7 @@ type StartedGame = {
 
 type Game = 
     | Started of StartedGame
-    | Finished of (int * Hand * int list) option
+    | Finished of (int * Hand) option
 
 module Array2D = 
     let toSeq array =
@@ -123,31 +123,27 @@ module Game =
         game
     
     let run (game:StartedGame) = 
-        let rec run last (game:StartedGame) =
+        let rec run (last:Option<int * Hand>) (game:StartedGame) =
             match game.Input with
             | [] -> 
                 Finished last 
             | i::ti -> 
-                let rec play loosers last hands =
-                    match hands with
-                    | [] -> last |> Option.map(fun x -> loosers, x)
-                    | h::hs -> 
-                        match Hand.mark i h with
-                        | Win w -> play loosers (Some (i,w,ti)) hs
-                        | Loose l -> play (l::loosers) last hs
-
-                match play [] None game.Hands with
-                | Some (loosers, l) ->
-                    match loosers with
-                    | [] -> Finished (Some l)
-                    | hands -> run (Some l) {game with Hands=hands; Input=ti}
-                | None -> run None {game with Input=ti}
+                game.Hands 
+                |> List.fold (fun (loosers, w) h -> 
+                    match Hand.mark i h with
+                    | Win w -> loosers, Some (i, w)
+                    | Loose l -> l::loosers, w
+                ) (List.empty, None)
+                |> function
+                    | [], w -> Finished w
+                    | hands, w -> 
+                        run (w |> function Some v -> Some v | None -> last) {game with Hands=hands; Input=ti} 
         run None game
 
     let score = function
         | Started _ -> 0
         | Finished None -> 0
-        | Finished (Some (i,h,_)) -> 
+        | Finished (Some (i,h)) -> 
             i * (h.Board |> Array2D.toSeq |> Seq.map (function Some (i, UnMarked) -> i | _ -> 0) |> Seq.fold (+) 0)
 
 let input = """7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
