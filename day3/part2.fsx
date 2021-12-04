@@ -41,7 +41,6 @@ input |> co2 |> convert = 10
 
 (input |> oxygen |> convert) * (input |> co2 |> convert) = 230
 
-
 let inputs =     
     __SOURCE_DIRECTORY__ + "/part2.csv"
     |> System.IO.File.ReadAllLines
