@@ -6,8 +6,7 @@ module Parsing =
 
 
 let solve f l = 
-    let mn = l |> List.min
-    let mx = l |> List.max
+    let (mn, mx) = l |> List.fold (fun (l,h) x -> min l x, max h x) (System.Int32.MaxValue, System.Int32.MinValue)
 
     let possibilites = [mn..mx]
     
@@ -39,3 +38,4 @@ part2Cost 4 1 = 1 + 2 + 3
 let input = __SOURCE_DIRECTORY__ + "/part1.csv" |> System.IO.File.ReadAllText |> parse
 
 input |> solve part1Cost = 359648
+input |> solve part2Cost = 100727924
