@@ -1,7 +1,7 @@
 // y -> index1 -> line
 // x -> index2 -> column
 
-let adjencies mny mnx mxy mxx y x =
+let adjencies mny mnx mxy mxx (y, x) =
     [ 
         y, x-1
         // y-1, x-1
@@ -40,7 +40,7 @@ let lowpoints (a: int [,]) =
     |> List.collect(fun y -> 
         [0..(mx-1)]
         |> List.choose (fun x -> 
-            let coords = adjencies 0 0 my mx y x
+            let coords = adjencies 0 0 my mx (y, x)
             let v = Array2D.get a y x 
             // printfn "(%i, %i) %i" y x v
             // printfn "(%i, %i) %A" my mx coords
@@ -63,10 +63,10 @@ let part2 (a: int [,]) =
             | [] -> 
                 // printfn "bassin %A, (%A)" r visited
                 r, visited
-            | (y, x)::coords ->  
-                let adjs = adjencies 0 0 my mx y x |> List.filter (fun c -> visited |> List.contains c |> not)
-                let visited = (y, x) :: visited
-                let r = (y, x) :: r
+            | coord::coords ->  
+                let adjs = adjencies 0 0 my mx coord |> List.filter (fun c -> visited |> List.contains c |> not)
+                let visited = coord::visited
+                let r = coord::r
                 
                 let news = adjs |> List.filter (fun (y, x) -> Array2D.get a y x < 9)
                 let visited = List.append visited news
