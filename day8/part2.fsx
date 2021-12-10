@@ -150,14 +150,17 @@ let score2 x =
 input 
 |> part2
 |> Array.map (fst >> score2)
-|> Array.sum = 61229
+|> Array.sum
+ = 61229
 
 __SOURCE_DIRECTORY__ + "/part1.txt"
 |> System.IO.File.ReadAllText
-|> part1 = 330
+|> part1 
+ = 330
 
 __SOURCE_DIRECTORY__ + "/part1.txt"
 |> System.IO.File.ReadAllText
 |> part2
 |> Array.map (fst >> score2)
-|> Array.sum = 1010472 
+|> Array.sum
+ = 1010472 
