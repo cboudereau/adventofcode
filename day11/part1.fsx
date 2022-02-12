@@ -61,8 +61,8 @@ let steps (m:int[,], (counter:int)) =
                     flash i j counter v m
                 else counter) counter
         else counter
-    let mutable counter = counter
     m |> Array2D.iteri (fun i j v -> v + 1 |> Array2D.set m i j) 
+    let mutable counter = counter
     m |> Array2D.iteri (fun i j v -> counter <- flash i j counter v m)
     m |> Array2D.iteri (fun i j v -> if v < 0 then Array2D.set m i j 0)
     m, counter
