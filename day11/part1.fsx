@@ -120,7 +120,7 @@ let real = """3322874652
 2424323348
 2265635842"""
 
-(parse real, 0) |> repeat 100 steps
+(parse real, 0) |> repeat 100 steps |> snd = 1613
 
 ("""5877777777
 8877777777
@@ -133,7 +133,7 @@ let real = """3322874652
 7777777777
 7777777777""" 
 |> parse, 193)
-|> repeatWhile (fun x y -> snd y - snd x = 100) steps
+|> repeatWhile (fun x y -> snd y - snd x = 100) steps = 2
 
 (parse real, 0)
-|> repeatWhile (fun x y -> snd y - snd x = 100) steps
+|> repeatWhile (fun x y -> snd y - snd x = 100) steps = 510
