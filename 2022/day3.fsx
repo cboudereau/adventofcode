@@ -40,7 +40,31 @@ CrZsJsPPZsGzwwsLwLmpwMDw"""
 |> day31 
 |> Test.assertEq "day31 input" 157
 
-"""/day3.txt"""
-|> readFile
+let fullInput = """/day3.txt""" |> readFile
+fullInput
 |> day31 
 |> Test.assertEq "day31 full input" 7746
+
+
+let day32 = 
+    let mask = [|'a'..'z'|] |> Array.append [|'A'..'Z'|] |> set
+    fun x ->
+        x
+        |> Array.chunkBySize 3
+        |> Array.map (Array.fold (fun s x -> x |> set |> Set.intersect s) mask >> Seq.exactlyOne)
+        |> Array.map priority
+        |> Array.sum 
+
+"""vJrwpWtwJgWrhcsFMMfFFhFp
+jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+PmmdzqPrVvPwwTWBwg
+wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+ttgJtRGJQctTZtZT
+CrZsJsPPZsGzwwsLwLmpwMDw"""
+|> fun x -> x.Split('\n')
+|> day32
+|> Test.assertEq "day3-2 input" 70
+
+fullInput
+|> day32 
+|> Test.assertEq "day3-2 full input" 2604
