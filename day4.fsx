@@ -37,8 +37,36 @@ let day41 =
 
 let readFile filePath = System.IO.File.ReadAllLines(__SOURCE_DIRECTORY__ + filePath)
 
-"""/day4.txt"""
-|> readFile
-|> parse
+let fullInput = """/day4.txt""" |> readFile |> parse
+
+fullInput
 |> day41
 |> Test.assertEq "full input day41" 657
+
+
+"""2-4,6-8
+2-3,4-5
+5-7,7-9
+2-8,3-7
+6-6,4-6
+2-6,4-8"""
+|> fun x -> x.Split('\n')
+|> parse
+|> Array.map (fun ((x1, x2), (y1, y2)) -> 
+        let s1 = set [x1..x2]
+        let s2 = set [y1..y2]
+
+        if Set.intersect s1 s2 <> Set.empty then 1
+        else 0
+    )
+|> Array.sum = 4
+
+fullInput
+|> Array.map (fun ((x1, x2), (y1, y2)) -> 
+        let s1 = set [x1..x2]
+        let s2 = set [y1..y2]
+
+        if Set.intersect s1 s2 <> Set.empty then 1
+        else 0
+    )
+|> Array.sum
