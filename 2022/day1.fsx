@@ -1,3 +1,8 @@
+module Test = 
+    let assertEq msg expected actual =
+        if expected = actual then printfn "Test %s Ok" msg
+        else failwithf "Test %s failed: expected '%A' but got '%A'" msg expected actual
+
 module Int32 = 
     let tryParse x = 
         match System.Int32.TryParse(x:string) with
@@ -40,16 +45,17 @@ let input = """1000
 
 10000""" |> fun x -> x.Split('\n')
 
-input |> day11 = 24000
+input |> day11 |> Test.assertEq "day11 input" 24000
+ 
 
 let readFile filePath = System.IO.File.ReadAllLines(__SOURCE_DIRECTORY__ + filePath)
 
 let fullInput = "/day1-1.txt" |> readFile
 
-fullInput |> day11 = 68292
+fullInput |> day11 |> Test.assertEq "day11 full input" 68292
 
 let day12 = parse >> List.sortDescending >> List.truncate 3 >> List.sum
 
-day12 input = 45000
+day12 input |> Test.assertEq "day12 input" 45000
 
-"/day1-2.txt" |> readFile |> day12
+"/day1-2.txt" |> readFile |> day12 |> Test.assertEq "day22 full input" 203203
