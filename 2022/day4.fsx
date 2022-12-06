@@ -43,6 +43,15 @@ fullInput
 |> day41
 |> Test.assertEq "full input day41" 657
 
+let day42 = 
+    Array.map (fun ((x1, x2), (y1, y2)) -> 
+            let s1 = set [x1..x2]
+            let s2 = set [y1..y2]
+
+            if Set.intersect s1 s2 <> Set.empty then 1
+            else 0
+        )
+    >> Array.sum
 
 """2-4,6-8
 2-3,4-5
@@ -52,21 +61,9 @@ fullInput
 2-6,4-8"""
 |> fun x -> x.Split('\n')
 |> parse
-|> Array.map (fun ((x1, x2), (y1, y2)) -> 
-        let s1 = set [x1..x2]
-        let s2 = set [y1..y2]
-
-        if Set.intersect s1 s2 <> Set.empty then 1
-        else 0
-    )
-|> Array.sum = 4
+|> day42
+|> Test.assertEq "input day42" 4
 
 fullInput
-|> Array.map (fun ((x1, x2), (y1, y2)) -> 
-        let s1 = set [x1..x2]
-        let s2 = set [y1..y2]
-
-        if Set.intersect s1 s2 <> Set.empty then 1
-        else 0
-    )
-|> Array.sum
+|> day42
+|> Test.assertEq "full input day42" 938
