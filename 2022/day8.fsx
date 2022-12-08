@@ -60,7 +60,7 @@ let day82 m =
     let h = m |> Array2D.length1
     let l = m |> Array2D.length2
 
-    [|
+    seq {
         for y = 1 to h - 2 do
             for x = 1 to l - 2 do
                 let v = m[y,x]
@@ -86,10 +86,9 @@ let day82 m =
 
                 let score = scenicScore 1 adjacencies
                 if score > 0L then yield (v, score), (y,x)
-    |] 
-    |> Array.sortByDescending(fst >> snd)
-    |> Array.head
-    |> (fst >> snd)
+    } 
+    |> Seq.map (fst >> snd)
+    |> Seq.max
 
 input |> parse |> day82 |> Test.assertEq "input day 8-2" 8L
 """/day8.txt""" |> readFile |> parse |> day82 |> Test.assertEq "full input day 8-1" 672280L
