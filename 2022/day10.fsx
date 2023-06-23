@@ -17,16 +17,16 @@ let (|Int32|_|) x =
     | true, v -> Some v
     | false, _ -> None
 
-module Command = 
+module Instruction = 
     let parse (input:string) = 
         match input with 
         | "noop" -> (1, 0)
         | Regex """addx (-?\d+)""" [Int32 x] -> (2, x)
         | other -> failwithf "unexpected input %s" input
 
-Command.parse "noop" |> Test.assertEq "noop command parsing" (1, 0)
-Command.parse "addx 2" |> Test.assertEq "addx command parsing" (2, 2)
-Command.parse "addx -2" |> Test.assertEq "addx command parsing" (2, -2)
+Instruction.parse "noop" |> Test.assertEq "noop command parsing" (1, 0)
+Instruction.parse "addx 2" |> Test.assertEq "addx command parsing" (2, 2)
+Instruction.parse "addx -2" |> Test.assertEq "addx command parsing" (2, -2)
 
 let readFile filePath = System.IO.File.ReadAllLines(__SOURCE_DIRECTORY__ + filePath) 
 
@@ -54,7 +54,7 @@ let part1 =
     readFile
     >> Array.fold (fun (sum, (totalCycles, register)) input -> 
 
-        let (cycles, x) = Command.parse input
+        let (cycles, x) = Instruction.parse input
 
         let newCycles = totalCycles + cycles
         let newRegister = register + x
@@ -67,3 +67,35 @@ let part1 =
 
 "/day10.example.txt" |> part1 |> Test.assertEq "part 1 example" 13140 
 "/day10.txt" |> part1 |> Test.assertEq "part 1" 14720 
+
+let sprite register = [register-1; register; register + 1]
+
+let rec cycle inst (output, (crtRowPos, register)) = 
+    let (ci, xi) = inst
+
+    if ci = 0 then (output, (crtRowPos, register))
+    else
+        let sprite = sprite register
+        let pixel = sprite |> List.tryPick (fun spritePos -> if spritePos = crtRowPos then Some "#" else None) |> Option.defaultValue "."
+        let output = sprintf "%s%s" output pixel
+    
+        let register = if ci = 1 then register + xi else register
+
+        let (crtRowPos, output) = 
+            if crtRowPos = 39 then 0, sprintf "%s%s" output System.Environment.NewLine
+            else crtRowPos + 1, output
+
+        cycle (ci - 1, xi) (output, (crtRowPos, register))
+
+let part2 = 
+    readFile
+    >> Array.fold (fun s x -> 
+        let inst = Instruction.parse x
+        cycle inst s
+    ) ("", (0, 1))
+    >> fst
+
+let readAll filePath = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + filePath)
+
+"/day10.example.txt" |> part2 |> Test.assertEq "example crt" (readAll "/day10.example.expected.txt") |> printfn "%s"
+"/day10.txt" |> part2 |> Test.assertEq "crt" (readAll "/day10.expected.txt") |> printfn "%s"
