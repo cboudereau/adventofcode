@@ -70,13 +70,11 @@ let part1 =
 
 let sprite register = [register-1; register; register + 1]
 
-let rec cycle inst (output, (crtRowPos, register)) = 
-    let (ci, xi) = inst
-
-    if ci = 0 then (output, (crtRowPos, register))
-    else
-        let sprite = sprite register
-        let pixel = sprite |> List.tryPick (fun spritePos -> if spritePos = crtRowPos then Some "#" else None) |> Option.defaultValue "."
+let rec cycle inst (output, (crtRowPos, register)) =     
+    match inst with
+    | (0,_) -> (output, (crtRowPos, register))
+    | ci, xi ->
+        let pixel = register |> sprite |> List.tryPick (fun spritePos -> if spritePos = crtRowPos then Some "#" else None) |> Option.defaultValue "."
         let output = sprintf "%s%s" output pixel
     
         let register = if ci = 1 then register + xi else register
@@ -87,12 +85,11 @@ let rec cycle inst (output, (crtRowPos, register)) =
 
         cycle (ci - 1, xi) (output, (crtRowPos, register))
 
+let flip f x y = f y x
+
 let part2 = 
     readFile
-    >> Array.fold (fun s x -> 
-        let inst = Instruction.parse x
-        cycle inst s
-    ) ("", (0, 1))
+    >> Array.fold (flip (Instruction.parse >> cycle)) ("", (0, 1))
     >> fst
 
 let readAll filePath = System.IO.File.ReadAllText(__SOURCE_DIRECTORY__ + filePath)
