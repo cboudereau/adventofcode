@@ -13,3 +13,19 @@ let parse = function '(' -> 1 | ')' -> -1 | other -> failwithf "unexpected '%c'"
 "./day1.txt"
 |> readFile
 |> Seq.fold (flip (parse >> (+))) 0 |> Test.assertEq "part1" 280
+
+let part2 = 
+    let rec part2 pos total = 
+        function
+        | [] -> -1
+        | h::t -> 
+            let x = parse h
+            let total = total + x
+            if total < 0 then pos
+            else part2 (pos + 1) total t 
+    part2 1 0
+
+"./day1.txt"
+|> readFile
+|> Seq.toList
+|> part2 |> Test.assertEq "part2" 1797
