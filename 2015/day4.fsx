@@ -14,15 +14,18 @@ let md5 (data : string) : string =
     ||> Array.fold (fun sb b -> sb.Append(b.ToString("x2")))
     |> string
 
-let magicHash secret =
+let magicHash value secret =
     let rec magicHash n secret = 
         let md5 = md5 (sprintf "%s%i" secret n)
-        if md5.StartsWith("00000") then n
+        if md5.StartsWith(value:string) then n
         else magicHash (n + 1) secret 
     magicHash 0 secret 
 
-magicHash "abcdef" |> Test.assertEq "abcdef609043" 609043
-magicHash "pqrstuv" |> Test.assertEq "pqrstuv1048970" 1048970
+let part1 = magicHash "00000"
+part1 "abcdef" |> Test.assertEq "abcdef609043" 609043
+part1 "pqrstuv" |> Test.assertEq "pqrstuv1048970" 1048970
 
-// part1
-magicHash "ckczppom" |> Test.assertEq "ckczppom117946" 117946
+part1 "ckczppom" |> Test.assertEq "ckczppom117946" 117946
+
+let part2 = magicHash "000000"
+part2 "ckczppom"
