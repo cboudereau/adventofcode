@@ -9,9 +9,6 @@ let (|Regex|_|) pattern input =
     if m.Success then Some(List.tail [ for g in m.Groups -> g.Value ])
     else None
 
-let (|Split|_|) sep input = 
-    Some ((input:string).Split(sep:string))
-
 let (|Int32|_|) x = 
     match System.Int32.TryParse(x:string) with
     | true, v -> Some v
