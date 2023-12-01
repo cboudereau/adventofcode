@@ -23,9 +23,9 @@ let prune (x:string) =
                 digits
                 |> Seq.filter (fst >> x.StartsWith)
                 |> Seq.tryHead
-            let remaining = x.Substring(1)
+            
             let pruned = found |> Option.map (snd >> sprintf "%i") |> Option.defaultWith (fun () -> sprintf "%c" x[0]) |> sprintf "%s%s" r
-            prune pruned remaining
+            x.Substring(1) |> prune pruned
     prune "" x        
 
 prune "two1nine" |> Test.assertEq "prune 219" "2wo19ine"
