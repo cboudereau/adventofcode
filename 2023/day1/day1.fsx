@@ -21,8 +21,8 @@ let prune (x:string) =
         else
             let found = 
                 digits
-                |> List.filter (fst >> x.StartsWith)
-                |> List.tryHead
+                |> Seq.filter (fst >> x.StartsWith)
+                |> Seq.tryHead
             match found with
             | Some (digit, value) -> 
                 let remaining = x.Substring(digit.Length - 1) // add last char
