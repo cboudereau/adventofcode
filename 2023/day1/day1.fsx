@@ -23,20 +23,14 @@ let prune (x:string) =
                 digits
                 |> Seq.filter (fst >> x.StartsWith)
                 |> Seq.tryHead
-            match found with
-            | Some (digit, value) -> 
-                let remaining = x.Substring(digit.Length - 1) // add last char
-                let pruned = sprintf "%s%i" r value
-                prune pruned remaining
-            | None -> 
-                let remaining = x.Substring(1)
-                let pruned = sprintf "%s%c" r x[0]
-                prune pruned remaining
+            let remaining = x.Substring(1) // add last char
+            let pruned = found |> Option.map (snd >> sprintf "%i") |> Option.defaultWith (fun () -> sprintf "%c" x[0]) |> sprintf "%s%s" r
+            prune pruned remaining
     prune "" x        
 
-prune "two1nine" |> Test.assertEq "prune 219" "2o19e"
-prune "eightwothree" |> Test.assertEq "prune 8 3" "82o3e"
-prune "7pqrstsixteen" |> Test.assertEq "prune 7 6" "7pqrst6xteen"
+prune "two1nine" |> Test.assertEq "prune 219" "2wo19ine"
+prune "eightwothree" |> Test.assertEq "prune 8 3" "8igh2wo3hree"
+prune "7pqrstsixteen" |> Test.assertEq "prune 7 6" "7pqrst6ixteen"
 
 let part1 (input:string []) = 
     input
