@@ -23,7 +23,7 @@ let prune (x:string) =
                 digits
                 |> Seq.filter (fst >> x.StartsWith)
                 |> Seq.tryHead
-            let remaining = x.Substring(1) // add last char
+            let remaining = x.Substring(1)
             let pruned = found |> Option.map (snd >> sprintf "%i") |> Option.defaultWith (fun () -> sprintf "%c" x[0]) |> sprintf "%s%s" r
             prune pruned remaining
     prune "" x        
