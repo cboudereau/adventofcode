@@ -59,17 +59,16 @@ let part2 =
     readAllLines
     >> Array.map Scratchcard.parse
     >> Tuple.two Map.empty
-    >> fun (copies, scratchcards) -> 
-        (copies, scratchcards) 
-        ||> Array.fold (fun copies scratchcard -> 
+    >> flip (||>) (Array.fold (fun copies scratchcard -> 
             let cardId = fst scratchcard
             let matchingNumberCount = snd scratchcard |> List.length
             let copies = copies |> Map.change cardId (Option.orElse (Some 1))
             let instances = copies[cardId]
             let hits = List.init matchingNumberCount ((+) (cardId + 1))
-            (copies, hits) ||> List.fold (flip (fun cardIdHit -> 
+            Tuple.two copies hits 
+            ||> List.fold (flip (fun cardIdHit -> 
                 Map.change cardIdHit (Option.orElse (Some 1) >> Option.map ((+) instances)))) 
-        ) 
+        ) )
     >> Map.values
     >> Seq.sum
 
