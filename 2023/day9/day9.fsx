@@ -3,17 +3,6 @@ module Test =
         if expected = actual then printfn "Test %s Ok" msg
         else failwithf "Test %s failed: expected '%A' but got '%A'" msg expected actual
 
-let (|Regex|_|) pattern input =
-    let m = System.Text.RegularExpressions.Regex.Match(input, pattern)
-    if m.Success then Some(List.tail [ for g in m.Groups -> g.Value ])
-    else None
-
-module Int64 = 
-    let tryParse (x:string) = 
-        match System.Int64.TryParse(x) with
-        | true, v -> Some (v)
-        | _ -> None
-let (|Int64|_|) = Int64.tryParse
 module String = 
     let split c x = 
         (x:string).Split((c:string),System.StringSplitOptions.RemoveEmptyEntries)
