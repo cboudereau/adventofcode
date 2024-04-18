@@ -1,11 +1,10 @@
 fn unfold<T, F, S>(seed: T, state: S, generator: F) -> T
 where
-    T: Copy + Default,
-    F: Fn(S, T) -> Option<(S, T)>,
+    F: Fn(S, &T) -> Option<(S, T)>,
 {
     let mut item = seed;
     let mut internal_state = state;
-    while let Some((new_state, v)) = generator(internal_state, item) {
+    while let Some((new_state, v)) = generator(internal_state, &item) {
         item = v;
         internal_state = new_state;
     }
@@ -24,44 +23,46 @@ fn part1_unfold() -> usize {
         BAD_STRINGS.contains(x)
     }
 
-    unfold(0, include_str!("../../day5.txt").split("\r\n"), |mut input_line, counter| {
-        input_line.next().map(|line| {
-            let (is_invalid, has_same_letter_twice, vowels_counter) = unfold(
-                (false, false, 0),
-                (None, line.chars()),
-                |(previous_char, mut chars),
-                 (is_invalid, has_same_letter_twice, vowels_counter)| match (
-                    is_invalid,
-                    previous_char,
-                    chars.next(),
-                ) {
-                    (true, _, _) => None,
-                    (false, None, None) => None,
-                    (is_invalid, None, Some(c)) => {
-                        let state = (Some(c), chars);
-                        let vowels_counter = if is_vowel(&c) { 1 } else { 0 } + vowels_counter;
-                        let entry = (is_invalid, has_same_letter_twice, vowels_counter);
-                        Some((state, entry))
-                    }
-                    (false, Some(_), None) => None,
-                    (false, Some(p), Some(c)) => {
-                        let state = (Some(c), chars);
-                        let vowels_counter = if is_vowel(&c) { 1 } else { 0 } + vowels_counter;
-                        let is_invalid = is_invalid || has_bad_strings(&[p, c]);
-                        let has_same_letter_twice = has_same_letter_twice || p == c;
-                        let entry = (is_invalid, has_same_letter_twice, vowels_counter);
-                        Some((state, entry))
-                    }
-                },
-            );
-            let counter = if !is_invalid && has_same_letter_twice && vowels_counter > 2 {
-                1
-            } else {
-                0
-            } + counter;
-            (input_line, counter)
-        })
-    })
+    unfold(
+        0,
+        include_str!("../../day5.txt").split("\r\n"),
+        |mut input_line, counter| {
+            input_line.next().map(|line| {
+                let (is_invalid, has_same_letter_twice, vowels_counter) = unfold(
+                    (false, false, 0),
+                    (None, line.chars()),
+                    |(previous_char, mut chars),
+                     (is_invalid, has_same_letter_twice, vowels_counter)| match (
+                        is_invalid,
+                        chars.next(),
+                    ) {
+                        (true, _) => None,
+                        (false, None) => None,
+                        (false, Some(c)) => {
+                            let vowels_counter = if is_vowel(&c) { 1 } else { 0 } + vowels_counter;
+                            let entry = previous_char
+                                .map(|p| {
+                                    let is_invalid = *is_invalid || has_bad_strings(&[p, c]);
+                                    let has_same_letter_twice = *has_same_letter_twice || p == c;
+                                    (is_invalid, has_same_letter_twice, vowels_counter)
+                                })
+                                .unwrap_or_else(|| {
+                                    (*is_invalid, *has_same_letter_twice, vowels_counter)
+                                });
+                            let state = (Some(c), chars);
+                            Some((state, entry))
+                        }
+                    },
+                );
+                let counter = if !is_invalid && has_same_letter_twice && vowels_counter > 2 {
+                    1
+                } else {
+                    0
+                } + counter;
+                (input_line, counter)
+            })
+        },
+    )
 }
 
 // this implementation uses a fold which does not break as soon as bad strings is checked
