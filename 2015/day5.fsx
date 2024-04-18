@@ -4,8 +4,6 @@ module Test =
         else failwithf "Test %s failed: expected '%A' but got '%A'" msg expected actual
         actual
 
-let flip f x y = f y x
-
 let isVowel = 
     let vowel = "aeiou".ToCharArray()
     fun x -> vowel |> Array.contains x
@@ -13,7 +11,7 @@ let isVowel =
 let hasBadStrings = 
     let badStrings = [| ('a','b'); ('c','d'); ('p','q'); ('x','y') |]
     fun x -> badStrings |> Array.contains x
-    
+
 let part1 (x:string) = 
 
     let rec validate state l = 
