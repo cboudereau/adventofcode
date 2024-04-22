@@ -47,23 +47,26 @@ let parse = function
 let x = Array2D.zeroCreate<bool> 10 10
 Array2D.set x 1 2 true
 x
-let part1 (m: bool array2d) action (xmin, ymin) (xmax, ymax) = 
-    for y in [ymin .. ymax] do
-        for x in [xmin .. xmax] do
-            let v = 
-                match action with
-                | TurnOn -> true
-                | TurnOff -> false
-                | Toggle -> Array2D.get m y x |> not 
-            Array2D.set m y x v
-    m
+let part1 = 
+
+    let part1 (m: bool array2d) action (xmin, ymin) (xmax, ymax) = 
+        for y in [ymin .. ymax] do
+            for x in [xmin .. xmax] do
+                let v = 
+                    match action with
+                    | TurnOn -> true
+                    | TurnOff -> false
+                    | Toggle -> Array2D.get m y x |> not 
+                Array2D.set m y x v
+        m
+
+    let m = Array2D.zeroCreate<bool> 1000 1000
+
+    Array.map (parse >> Option.get)
+    >> Array.fold (fun m (action, c1, c2) -> part1 m action c1 c2) m
+    >> Array2D.fold (fun s -> function true -> s + 1 | false -> s) 0
 
 let readFile file = System.IO.Path.Combine(__SOURCE_DIRECTORY__, file)|> System.IO.File.ReadAllLines
 
-let m = Array2D.zeroCreate<bool> 1000 1000
 
-"day6.txt"
-|> readFile
-|> Array.map (parse >> Option.get)
-|> Array.fold (fun m (action, c1, c2) -> part1 m action c1 c2) m
-|> Array2D.fold (fun s -> function true -> s + 1 | false -> s) 0
+"day6.txt" |> readFile |> part1 |> Test.assertEq "part1" 377891
