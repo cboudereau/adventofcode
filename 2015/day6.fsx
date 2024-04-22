@@ -69,3 +69,28 @@ let part1 =
 let readFile file = System.IO.Path.Combine(__SOURCE_DIRECTORY__, file)|> System.IO.File.ReadAllLines
 
 "day6.txt" |> readFile |> part1 |> Test.assertEq "part1" 377891
+
+let part2 = 
+    let part2 (m: uint64 array2d) action (xmin, ymin) (xmax, ymax) = 
+        for y in [ymin .. ymax] do
+            for x in [xmin .. xmax] do
+                let previous = Array2D.get m y x
+                let v = 
+                    match action with
+                    | TurnOn -> previous + 1UL
+                    | TurnOff -> 
+                        if previous = 0UL then 0UL
+                        else previous - 1UL
+                    | Toggle ->  previous + 2UL
+                Array2D.set m y x v
+        m
+
+    let m = Array2D.zeroCreate<uint64> 1000 1000
+
+    Array.map (parse >> Option.get)
+    >> Array.fold (fun m (action, c1, c2) -> part2 m action c1 c2) m
+    >> Array2D.fold (fun s x -> s + x) 0UL
+
+"day6.txt" |> readFile |> part2
+
+// 13396307 too low
