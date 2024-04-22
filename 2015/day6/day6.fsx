@@ -44,9 +44,6 @@ let parse = function
 "toggle 0,0 through 999,0" |> parse |> Test.assertEq "parsing 2" (Some (Toggle, (0, 0), (999, 0)))
 "turn off 499,499 through 500,500" |> parse |> Test.assertEq "parsing 3" (Some (TurnOff, (499, 499), (500, 500)))
 
-let x = Array2D.zeroCreate<bool> 10 10
-Array2D.set x 1 2 true
-x
 let part1 = 
 
     let part1 (m: bool array2d) action (xmin, ymin) (xmax, ymax) = 
