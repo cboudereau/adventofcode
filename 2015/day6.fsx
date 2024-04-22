@@ -68,5 +68,4 @@ let part1 =
 
 let readFile file = System.IO.Path.Combine(__SOURCE_DIRECTORY__, file)|> System.IO.File.ReadAllLines
 
-
 "day6.txt" |> readFile |> part1 |> Test.assertEq "part1" 377891
