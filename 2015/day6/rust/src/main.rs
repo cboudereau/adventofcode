@@ -73,19 +73,18 @@ fn part2(input: &str) -> i32 {
             let ymax = ymax.parse::<usize>().unwrap();
 
             // optimized by running cargo clippy --all-targets --all-features -- -D warnings
-            for i in ymin..=ymax {
-                for j in xmin..=xmax {
-                    let previous = matrix[i][j];
-                    matrix[i][j] = match action {
-                        Action::TurnOn => previous + 1,
+            for row in matrix.iter_mut().take(ymax + 1).skip(ymin) {
+                for previous in row.iter_mut().take(xmax + 1).skip(xmin) {
+                    *previous = match action {
+                        Action::TurnOn => *previous + 1,
                         Action::TurnOff => {
-                            if previous > 0 {
-                                previous - 1
+                            if *previous > 0 {
+                                *previous - 1
                             } else {
-                                previous
+                                *previous
                             }
                         }
-                        Action::Toggle => previous + 2,
+                        Action::Toggle => *previous + 2,
                     }
                 }
             }
