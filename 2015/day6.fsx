@@ -60,11 +60,13 @@ let part1 =
                 Array2D.set m y x v
         m
 
-    let m = Array2D.zeroCreate<bool> 1000 1000
+    fun input -> 
+        let m = Array2D.zeroCreate<bool> 1000 1000
 
-    Array.map (parse >> Option.get)
-    >> Array.fold (fun m (action, c1, c2) -> part1 m action c1 c2) m
-    >> Array2D.fold (fun s -> function true -> s + 1 | false -> s) 0
+        input
+        |> Array.map (parse >> Option.get)
+        |> Array.fold (fun m (action, c1, c2) -> part1 m action c1 c2) m
+        |> Array2D.fold (fun s -> function true -> s + 1 | false -> s) 0
 
 let readFile file = System.IO.Path.Combine(__SOURCE_DIRECTORY__, file)|> System.IO.File.ReadAllLines
 
@@ -84,13 +86,12 @@ let part2 =
                     | Toggle ->  previous + 2UL
                 Array2D.set m y x v
         m
+    fun input -> 
+        let m = Array2D.zeroCreate<uint64> 1000 1000
 
-    let m = Array2D.zeroCreate<uint64> 1000 1000
+        input
+        |> Array.map (parse >> Option.get)
+        |> Array.fold (fun m (action, c1, c2) -> part2 m action c1 c2) m
+        |> Array2D.fold (fun s x -> s + x) 0UL
 
-    Array.map (parse >> Option.get)
-    >> Array.fold (fun m (action, c1, c2) -> part2 m action c1 c2) m
-    >> Array2D.fold (fun s x -> s + x) 0UL
-
-"day6.txt" |> readFile |> part2
-
-// 13396307 too low
+"day6.txt" |> readFile |> part2 |> Test.assertEq "part2" 14110788UL
