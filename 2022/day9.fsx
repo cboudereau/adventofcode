@@ -40,10 +40,10 @@ module Command =
         | other -> failwithf "unexpected command %s" other
 
     let toCoords = function
-        | Up -> (0, 1) : Coords
-        | Down -> (0, -1)
-        | Right -> (1, 0)
-        | Left -> (-1, 0)
+        | Up -> (-1, 0) : Coords
+        | Down -> (1, 0)
+        | Right -> (0, 1)
+        | Left -> (0, -1)
 
 Command.parse "R 4" |> Test.assertEq "day 8-1 command parsing" (4, Right)
 Command.parse "U 4" |> Test.assertEq "day 8-1 command parsing" (4, Up)
