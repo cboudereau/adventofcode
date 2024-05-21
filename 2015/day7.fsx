@@ -126,36 +126,3 @@ let resolvedAssignments =
 
 
 resolvedAssignments |> Map.find "a" |> resolve resolvedAssignments = Constant 46065us
-
-// OK
-// lh : 0 RSHIFT "3"
-// li : 1 RSHIFT "5"
-// lk : 0 AND ("lh", "li")
-// lj : 1 OR ("lh", "li")
-// ll : 65535 NOT "lk"
-
-// lg : 0 RSHIFT "2"
-// lm : 1 AND ("lj", "ll")
-// lo : 0 AND ("lg", "lm")
-// ld : 0 RSHIFT "1"
-// le : 60 LSHIFT "15"
-// ln : 1 OR ("lg", "lm")
-// lp : 65535 NOT "lo"
-// lf : 60 OR ("ld", "le")
-// lq : 1 AND ("ln", "lp")
-// ls : 0 AND ("lf", "lq")
-// lr : 61 OR ("lf", "lq")
-// lt : 65535 NOT "ls"
-// lu : 61 AND ("lr", "lt")
-// lw : 4 LSHIFT "1"
-// lv : 1 AND ("1", "lu")
-// lx : 5 OR ("lw", "lv")
-
-depsStack
-
-assignments["lh"]
-resolvedAssignments["lh"]
-
-4us ||| 1us
-
-// Not 5
