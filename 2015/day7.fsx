@@ -80,10 +80,6 @@ let assignments =
         else s |> Map.add target value
     ) Map.empty
 
-assignments |> Map.find "a"
-
-assignments["lh"]
-
 let rec stack assignments current s = 
     match current |> List.collect (fun x -> assignments |> Map.find x |> allDependencies) with
     | [] -> s
@@ -91,10 +87,7 @@ let rec stack assignments current s =
         let deps = List.distinct deps
         List.append deps s |> List.distinct |> stack assignments deps
 
-// assignments |> Map.find "lw" |> allDependencies
 let depsStack = stack assignments ["a"] ["a"]
-
-assignments |> Map.find "lh"
 
 let resolve (assignments:Map<string, Value>) = 
     let resolveExpression = 
@@ -116,7 +109,6 @@ let resolve (assignments:Map<string, Value>) =
     | Expression exp -> resolveExpression exp |> Constant
     | Constant x -> Constant x
 
-
 let resolvedAssignments = 
     depsStack |> List.fold (fun (s:Map<string, Value>) x -> 
         let exp = s |> Map.find x
@@ -124,4 +116,5 @@ let resolvedAssignments =
         s |> Map.add x value
     ) assignments
 
+// Part 1
 resolvedAssignments |> Map.find "a" = Constant 46065us
