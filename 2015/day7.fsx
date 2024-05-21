@@ -1,18 +1,24 @@
+module Test = 
+    let assertEq msg expected actual =
+        if expected = actual then printfn "Test %s Ok" msg
+        else failwithf "Test %s failed: expected '%A' but got '%A'" msg expected actual
+        actual
+
 let x = 123us
 let y = 456us
 
 let d = x &&& y //AND
-d = 72us
+Test.assertEq "AND" d 72us
 let e = x ||| y //OR
-e = 507us
+Test.assertEq "OR" e 507us
 let f = x <<< 2 //LSHIFT
-f = 492us
+Test.assertEq "LSHIFT" f 492us
 let g = y >>> 2 //RSHIFT
-g = 114us
+Test.assertEq "RSHIFT" g 114us
 let h = ~~~x    //NOT
-h = 65412us
+Test.assertEq "NOT" h 65412us
 let i = ~~~y    //NOT
-i = 65079us
+Test.assertEq "NOT" i 65079us
 
 type Expression = 
     | AND of (string * string)
@@ -30,10 +36,6 @@ let (|Regex|_|) pattern input =
     let m = System.Text.RegularExpressions.Regex.Match(input, pattern)
     if m.Success then Some(List.tail [ for g in m.Groups -> g.Value ])
     else None
-
-let readAll (filePath:string) = System.IO.Path.Combine(__SOURCE_DIRECTORY__, filePath) |> System.IO.File.ReadAllText
-
-let instructions = readAll "day7.txt"
 
 let (|UInt16|_|) x =
     match System.UInt16.TryParse(x:string) with
@@ -68,18 +70,6 @@ let allDependencies = function
     | Constant _ -> []
     | Expression e -> dependencies e
 
-let assignments = 
-    instructions.Split(System.Environment.NewLine)
-    |> Array.map (
-        function
-        | Regex """(.*)\s->\s(.*)""" [Value value; target] -> target, value
-        | other -> failwithf "unexpected instruction '%s'" other
-    )
-    |> Array.fold (fun s (target, value) -> 
-        if s |> Map.containsKey target then failwithf "assignment for '%s' already exists" target
-        else s |> Map.add target value
-    ) Map.empty
-
 let rec stack assignments current s = 
     match current |> List.collect (fun x -> assignments |> Map.find x |> allDependencies) with
     | [] -> s
@@ -108,19 +98,34 @@ let resolve (assignments:Map<string, Value>) =
     | Constant x -> Constant x
 
 let compute assignments variable = 
-    let depsStack = stack assignments [variable] [variable]
-    let resolvedAssignments = 
-        depsStack |> List.fold (fun (s:Map<string, Value>) x -> 
+    let stack = stack assignments [variable] [variable]
+    let register = 
+        stack |> List.fold (fun (s:Map<string, Value>) x -> 
             let exp = s |> Map.find x
             let value = resolve s exp
             s |> Map.add x value
         ) assignments
-
-    resolvedAssignments |> Map.find variable
+    register |> Map.find variable
 
 // Part 1
+let readAll (filePath:string) = System.IO.Path.Combine(__SOURCE_DIRECTORY__, filePath) |> System.IO.File.ReadAllText
+
+let instructions = readAll "day7.txt"
+
+let assignments = 
+    instructions.Split(System.Environment.NewLine)
+    |> Array.map (
+        function
+        | Regex """(.*)\s->\s(.*)""" [Value value; target] -> target, value
+        | other -> failwithf "unexpected instruction '%s'" other
+    )
+    |> Array.fold (fun s (target, value) -> 
+        if s |> Map.containsKey target then failwithf "assignment for '%s' already exists" target
+        else s |> Map.add target value
+    ) Map.empty
+
 let a = compute assignments "a" 
-a = Constant 46065us
+Constant 46065us |> Test.assertEq "part1" a
 
 // Part 2
-let part2assignments = compute (assignments |> Map.add "b" a) "a" = Constant 14134us
+Constant 14134us |> Test.assertEq "part2" (compute (assignments |> Map.add "b" a) "a")
