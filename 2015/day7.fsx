@@ -92,7 +92,7 @@ let rec stack assignments current s =
         List.append deps s |> List.distinct |> stack assignments deps
 
 // assignments |> Map.find "lw" |> allDependencies
-let depsStack = stack assignments ["a"] []
+let depsStack = stack assignments ["a"] ["a"]
 
 assignments |> Map.find "lh"
 
@@ -124,5 +124,4 @@ let resolvedAssignments =
         s |> Map.add x value
     ) assignments
 
-
-resolvedAssignments |> Map.find "a" |> resolve resolvedAssignments = Constant 46065us
+resolvedAssignments |> Map.find "a" = Constant 46065us
