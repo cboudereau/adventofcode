@@ -17,8 +17,8 @@ i = 65079us
 type Expression = 
     | AND of (string * string)
     | OR of (string * string)
-    | LSHIFT of string
-    | RSHIFT of string
+    | LSHIFT of (string * string)
+    | RSHIFT of (string * string)
     | NOT of string
     | VAR of string
 
@@ -43,8 +43,8 @@ let (|UInt16|_|) x =
 let (|Operation|_|) = function
     | Regex """(.*)\sAND\s(.*)""" [x; y] -> Some (AND(x, y))
     | Regex """(.*)\sOR\s(.*)""" [x; y] -> Some (OR(x, y))
-    | Regex """LSHIFT\s(.*)""" [x] -> Some (LSHIFT x)
-    | Regex """RSHIFT\s(.*)""" [x] -> Some (RSHIFT x)
+    | Regex """(.*)\sLSHIFT\s(.*)""" [x;y] -> Some (LSHIFT (x,y))
+    | Regex """(.*)\sRSHIFT\s(.*)""" [x;y] -> Some (RSHIFT (x,y))
     | Regex """NOT\s(.*)""" [x] -> Some (NOT x)
     | Regex """([^\s]+)""" [variable] -> Some (VAR variable)
     | _ -> None
@@ -57,12 +57,16 @@ let (|Value|) = function
 let dependencies = 
     (function
     | OR (x, y)
-    | AND (x, y) -> [x;y]
-    | LSHIFT x
-    | RSHIFT x
+    | AND (x, y) 
+    | LSHIFT (x,y)
+    | RSHIFT (x,y) -> [x;y]
     | VAR x
     | NOT x -> [x])
     >> List.filter (function UInt16 _ -> false | _ -> true)
+
+let allDependencies = function
+    | Constant _ -> []
+    | Expression e -> dependencies e
 
 let assignments = 
     instructions.Split(System.Environment.NewLine)
@@ -76,22 +80,82 @@ let assignments =
         else s |> Map.add target value
     ) Map.empty
 
-assignments |> Map.find "aa"
+assignments |> Map.find "a"
 
-let adjacencies = 
-    assignments 
-    |> Map.map (fun _ expression -> 
-        match expression with
-        | Expression exp -> dependencies exp
-        | Constant _ -> []
-    )
+assignments["lh"]
 
-let initIndegree = adjacencies |> Map.map (fun _ _ -> 0)
+let rec stack assignments current s = 
+    match current |> List.collect (fun x -> assignments |> Map.find x |> allDependencies) with
+    | [] -> s
+    | deps -> 
+        let deps = List.distinct deps
+        List.append deps s |> List.distinct |> stack assignments deps
 
-adjacencies
-|> Map.fold(fun s _ deps -> 
-    deps |> List.fold (fun s dep -> 
-        s |> Map.change dep (function Some c -> Some (c + 1) | None -> failwithf "unexpected '%s' dep" dep)
-    ) s
-) initIndegree
-|> Map.toList
+// assignments |> Map.find "lw" |> allDependencies
+let depsStack = stack assignments ["a"] []
+
+assignments |> Map.find "lh"
+
+let resolve (assignments:Map<string, Value>) = 
+    let resolveExpression = 
+        let resolveValue (assignments:Map<string, Value>) x = 
+            match x with
+            | UInt16 x -> x
+            | variable -> 
+                match assignments |> Map.find variable with
+                | Constant x -> x
+                | _ -> failwithf "cannot resolve value to constant '%s'" variable
+        function
+        | AND (x, y) -> (resolveValue assignments x) &&& (resolveValue assignments y)
+        | OR (x, y) -> (resolveValue assignments x) ||| (resolveValue assignments y)
+        | LSHIFT (x,y) -> (resolveValue assignments x) <<< (resolveValue assignments y |> int)  
+        | RSHIFT (x,y) -> (resolveValue assignments x) >>> (resolveValue assignments y |> int)
+        | NOT x -> ~~~(resolveValue assignments x)
+        | VAR x -> resolveValue assignments x
+    function
+    | Expression exp -> resolveExpression exp |> Constant
+    | Constant x -> Constant x
+
+
+let resolvedAssignments = 
+    depsStack |> List.fold (fun (s:Map<string, Value>) x -> 
+        let exp = s |> Map.find x
+        let value = resolve s exp
+        s |> Map.add x value
+    ) assignments
+
+
+resolvedAssignments |> Map.find "a" |> resolve resolvedAssignments = Constant 46065us
+
+// OK
+// lh : 0 RSHIFT "3"
+// li : 1 RSHIFT "5"
+// lk : 0 AND ("lh", "li")
+// lj : 1 OR ("lh", "li")
+// ll : 65535 NOT "lk"
+
+// lg : 0 RSHIFT "2"
+// lm : 1 AND ("lj", "ll")
+// lo : 0 AND ("lg", "lm")
+// ld : 0 RSHIFT "1"
+// le : 60 LSHIFT "15"
+// ln : 1 OR ("lg", "lm")
+// lp : 65535 NOT "lo"
+// lf : 60 OR ("ld", "le")
+// lq : 1 AND ("ln", "lp")
+// ls : 0 AND ("lf", "lq")
+// lr : 61 OR ("lf", "lq")
+// lt : 65535 NOT "ls"
+// lu : 61 AND ("lr", "lt")
+// lw : 4 LSHIFT "1"
+// lv : 1 AND ("1", "lu")
+// lx : 5 OR ("lw", "lv")
+
+depsStack
+
+assignments["lh"]
+resolvedAssignments["lh"]
+
+4us ||| 1us
+
+// Not 5
