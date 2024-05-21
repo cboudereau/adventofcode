@@ -87,8 +87,6 @@ let rec stack assignments current s =
         let deps = List.distinct deps
         List.append deps s |> List.distinct |> stack assignments deps
 
-let depsStack = stack assignments ["a"] ["a"]
-
 let resolve (assignments:Map<string, Value>) = 
     let resolveExpression = 
         let resolveValue (assignments:Map<string, Value>) x = 
@@ -109,12 +107,20 @@ let resolve (assignments:Map<string, Value>) =
     | Expression exp -> resolveExpression exp |> Constant
     | Constant x -> Constant x
 
-let resolvedAssignments = 
-    depsStack |> List.fold (fun (s:Map<string, Value>) x -> 
-        let exp = s |> Map.find x
-        let value = resolve s exp
-        s |> Map.add x value
-    ) assignments
+let compute assignments variable = 
+    let depsStack = stack assignments [variable] [variable]
+    let resolvedAssignments = 
+        depsStack |> List.fold (fun (s:Map<string, Value>) x -> 
+            let exp = s |> Map.find x
+            let value = resolve s exp
+            s |> Map.add x value
+        ) assignments
+
+    resolvedAssignments |> Map.find variable
 
 // Part 1
-resolvedAssignments |> Map.find "a" = Constant 46065us
+let a = compute assignments "a" 
+a = Constant 46065us
+
+// Part 2
+let part2assignments = compute (assignments |> Map.add "b" a) "a" = Constant 14134us
