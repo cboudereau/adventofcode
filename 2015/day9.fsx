@@ -22,7 +22,7 @@ let parse =
     | other -> failwithf "cannot parse input '%s'" other
 
 
-let neighbors current distances = 
+let neighbors distances current = 
     distances 
     |> List.choose (fun ((x,y),d) -> if x = current then Some (y,d) elif y = current then Some (x,d) else None)
 
@@ -33,9 +33,7 @@ let routes locations distances =
         | true, (unvisited, (path:(string * int) list)) -> 
             if unvisited |> Set.isEmpty then routes ((path |> List.rev)::results) q
             else 
-                let head = path |> List.head
-                let current = fst head
-                let neighbors = neighbors current distances |> List.filter (fst >> fun x -> unvisited |> Set.contains x)
+                let neighbors = path |> List.head |> fst |> neighbors distances  |> List.filter (fst >> fun x -> unvisited |> Set.contains x)
                 neighbors
                 |> List.map (fun (x,d) -> ((unvisited |> Set.remove x), (x, d)::path))
                 |> List.iter q.Enqueue
