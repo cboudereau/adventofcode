@@ -27,3 +27,8 @@ input |> lookAndSay |> Test.assertEq "example" "311311222113"
 |> Seq.fold (fun s _ -> lookAndSay s) input
 |> fun x -> x.Length
 |> Test.assertEq "part1" 360154
+
+[1..50]
+|> Seq.fold (fun s _ -> lookAndSay s) input
+|> fun x -> x.Length
+|> Test.assertEq "part1" 5103798
