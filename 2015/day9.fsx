@@ -52,7 +52,6 @@ let distances = "day9.txt" |> readAll |> Array.map parse
 
 let locations = distances |> Array.fold (fun s ((x,y), _) -> s |> Set.add x |> Set.add y ) Set.empty
 
-routes locations (distances |> Array.toList)
-|> List.map (fun path -> path |> List.fold (fun s x -> s + snd x) 0)
-|> List.min
-|> Test.assertEq "part1" 207
+let possibleRoutes = routes locations (distances |> Array.toList) |> List.map (fun path -> path |> List.fold (fun s x -> s + snd x) 0)
+possibleRoutes |> List.min |> Test.assertEq "part1" 207
+possibleRoutes |> List.max |> Test.assertEq "part2" 804
