@@ -16,7 +16,23 @@ let stringLength (x:string) =
         | _::t -> count (counter + 1) t
     x |> Seq.toList |> count 0
 
+let encodedStringLength (x:string) = 
+    let rec count counter = 
+        function
+        | [] -> counter
+        | '"'::t 
+        | '\\'::t -> count (counter + 2) t
+        | _::t -> count (counter + 1) t
+
+    2 + (x |> Seq.toList |> count 0)
+
+
 let part1 = Array.map (fun (x:string) -> (x.Length, stringLength x)) >> Array.fold (fun s (codeLength, stringLenght) -> s + codeLength - stringLenght) 0
 
-readAll "day8.example.txt" |> part1 |> Test.assertEq "part1" 12
-readAll "day8.txt" |> part1 |> Test.assertEq "part1" 1371
+"day8.example.txt" |> readAll |> part1 |> Test.assertEq "part1" 12
+"day8.txt" |> readAll |> part1 |> Test.assertEq "part1" 1371
+
+let part2 = Array.map (fun (x:string) -> (x.Length, encodedStringLength x)) >> Array.fold (fun s (codeLength, encodedStringLength) -> s + encodedStringLength - codeLength) 0
+
+"day8.example.txt" |> readAll |> part2 |> Test.assertEq "part2" 19
+"day8.txt" |> readAll |> part2 |> Test.assertEq "part2" 2117
