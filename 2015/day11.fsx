@@ -16,12 +16,23 @@ let is3LettersIncreasing (a,b,c) =
     ib - ia = 1 && ic - ib = 1
 
 let isValid x = 
-    let rec isValid has3LettersIncreasing pairs = function
-        | [] -> has3LettersIncreasing && pairs |> Set.count > 1
-        | a::b::t when pairs |> Set.count < 2 && a = b && pairs |> Set.contains a |> not -> isValid has3LettersIncreasing (pairs |> Set.add a) (b::t)
-        | a::b::c::t when not has3LettersIncreasing -> isValid (is3LettersIncreasing (a,b,c)) pairs (c::t)
-        | _::t -> isValid has3LettersIncreasing pairs t
-    (x:string) |> Seq.toList |> isValid false Set.empty
+    let rec hasPairs pairs = function
+        | _ when pairs |> Set.count = 2 -> true
+        | [] -> false
+        | a::b::t when pairs |> Set.count < 2 && a = b && pairs |> Set.contains a |> not -> hasPairs (Set.add a pairs) t
+        | _::t -> hasPairs pairs t
+
+    let rec has3LettersIncreasing = function
+        | [] -> false
+        | a::b::c::_ when is3LettersIncreasing(a,b,c) -> true
+        | _::t -> has3LettersIncreasing t
+
+    let vx = (x:string) |> Seq.toList
+    let hasPairs = hasPairs Set.empty vx 
+    // printfn "hasPairs: %b" hasPairs
+    let has3LettersIncreasing = has3LettersIncreasing vx
+    // printfn "has3LettersIncreasing: %b" has3LettersIncreasing
+    hasPairs && has3LettersIncreasing
 
 try isValid "hijklmmn" with _ -> false |> Test.assertEq "should fail since 'i' 'l' 'o' is not valid" false
 isValid "abbceffg" |> Test.assertEq "does not contains 3 letters increasing in a row" false
@@ -57,8 +68,4 @@ let rec nextValid (password:string) =
     else nextValid nextPassword
 
 nextValid "abcdefgh" |> Test.assertEq "example 1" "abcdffaa"
-nextValid "vzbxkghb"
-
-// not "vzcdeeaa"
-// not "vzccbcdd"
-// not "vzccdeaa"
+nextValid "vzbxkghb" |> Test.assertEq "part 1" "vzbxxyzz"
