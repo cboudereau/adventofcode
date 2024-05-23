@@ -54,7 +54,7 @@ let next (s:string):string =
             let nextH = next h
             let canIncrease = nextH = 'a' 
             nextString canIncrease (nextH::result) t
-        | h ::t -> nextString false (h::result) t
+        | h::t -> nextString false (h::result) t
     
     s |> Seq.toList |> List.rev |> nextString true [] |> List.toArray |> System.String
 
