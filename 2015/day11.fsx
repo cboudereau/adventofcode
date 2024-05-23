@@ -68,4 +68,4 @@ let rec nextValid (password:string) =
     else nextValid nextPassword
 
 nextValid "abcdefgh" |> Test.assertEq "example 1" "abcdffaa"
-nextValid "vzbxkghb" |> Test.assertEq "part 1" "vzbxxyzz"
+nextValid "vzbxkghb" |> Test.assertEq "part 1" "vzbxxyzz" |> nextValid |> Test.assertEq "part 2" "vzcaabcc"
