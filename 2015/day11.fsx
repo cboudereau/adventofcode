@@ -19,7 +19,7 @@ let isValid x =
     let rec isValid has3LettersIncreasing pairs = function
         | [] -> has3LettersIncreasing && pairs |> Set.count > 1
         | a::b::c::t when not has3LettersIncreasing -> isValid (is3LettersIncreasing (a,b,c)) pairs (c::t)
-        | a::b::t when pairs |> Set.count < 2 && a = b && pairs |> Set.contains a |> not -> isValid has3LettersIncreasing (pairs |> Set.add a) (b::t)
+        | a::b::t when pairs |> Set.count < 2 && a = b && pairs |> Set.contains a |> not -> isValid has3LettersIncreasing (pairs |> Set.add a) (t)
         | _::t -> isValid has3LettersIncreasing pairs t
     (x:string) |> Seq.toList |> isValid false Set.empty
 
@@ -59,4 +59,5 @@ let rec nextValid (password:string) =
 nextValid "abcdefgh" |> Test.assertEq "example 1" "abcdffaa"
 nextValid "vzbxkghb"
 
+// not "vzcdeeaa"
 // not "vzcdeeaa"
