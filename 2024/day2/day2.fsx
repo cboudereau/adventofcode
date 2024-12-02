@@ -3,7 +3,7 @@ let readFile filePath =
     |> Array.map (fun x -> x.Split(' ') |> Array.map System.Int64.Parse)
 
 
-let part1 count x = 
+let part1 x = 
     let isSafe (a:int64[]) = 
         let rec isSafe isNegative (a:int64 list) = 
             match a, isNegative with
@@ -17,5 +17,5 @@ let part1 count x =
     |> Array.length
 
 
-"sample.txt" |> readFile |> part1 0 = 2
-"day2.txt" |> readFile |> part1 0 = 269
+"sample.txt" |> readFile |> part1 = 2
+"day2.txt" |> readFile |> part1 = 269
