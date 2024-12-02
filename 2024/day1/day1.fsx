@@ -9,14 +9,22 @@ let readFile filePath =
                 x.Substring(pos + 1) |> System.Int32.Parse
             left, right
         )
-
-let day1 x =
-    x
     |> Array.fold (fun (left,right) (l,r) -> l::left, r::right) ([],[])
+
+let part1 x =
+    x
     |> fun (l,r) -> l |> List.sort, r |> List.sort
     |> fun (l,r) -> List.zip l r
     |> List.map (fun (l,r) -> abs (r - l))
     |> List.sum
 
-"sample.txt" |> readFile |> day1 = 11
-"day1.txt" |> readFile |> day1 = 2904518
+"sample.txt" |> readFile |> part1 = 11
+"day1.txt" |> readFile |> part1 = 2904518
+
+let part2 x = 
+    x 
+    |> fun (l, r) -> l |> List.map (fun x -> x * ((r |> List.filter ((=) x)) |> List.length))
+    |> List.sum
+
+"sample.txt" |> readFile |> part2 = 31
+"day1.txt" |> readFile |> part2
