@@ -6,7 +6,7 @@ public class UnitTest1
     [Fact]
     public void TestPart1Sample()
     {
-        var a = Get2DArray("../../../sample.txt");
+        var a = GetData("../../../sample.txt");
         int result = Part1(a);
         Assert.Equal(18, result);
     }
@@ -14,37 +14,37 @@ public class UnitTest1
     [Fact]
     public void TestPart1Input()
     {
-        var a = Get2DArray("../../../input.txt");
+        var a = GetData("../../../input.txt");
         Assert.Equal(2560, Part1(a));
     }
 
     [Fact]
     public void TestPart2Sample()
     {
-        var a = Get2DArray("../../../sample2.txt");
+        var a = GetData("../../../sample2.txt");
         Assert.Equal(9, Part2(a));
     }
 
     [Fact]
     public void TestPart2Input()
     {
-        var a = Get2DArray("../../../input.txt");
+        var a = GetData("../../../input.txt");
         Assert.Equal(1910, Part2(a));
     }
-    private static int Part2(char[,] a)
+    private static int Part2(string[] a)
     {
-        var l1 = a.GetLength(0);
-        var l2 = a.GetLength(1);
+        var l1 = a.Length;
+        var l2 = a[0].Length;
         var result = 0;
         for (var i = 1; i < l1 - 1; i++)
         {
             for (var j = 1; j < l2 - 1; j++)
             {
-                if (a[i, j] == 'A')
+                if (a[i][j] == 'A')
                 {
-                    if ((a[i - 1, j - 1] == 'M' && a[i + 1, j + 1] == 'S') || (a[i - 1, j - 1] == 'S' && a[i + 1, j + 1] == 'M'))
+                    if ((a[i - 1][j - 1] == 'M' && a[i + 1][j + 1] == 'S') || (a[i - 1][j - 1] == 'S' && a[i + 1][j + 1] == 'M'))
                     {
-                        if ((a[i - 1, j + 1] == 'M' && a[i + 1, j - 1] == 'S') || (a[i - 1, j + 1] == 'S' && a[i + 1, j - 1] == 'M'))
+                        if ((a[i - 1][j + 1] == 'M' && a[i + 1][j - 1] == 'S') || (a[i - 1][j + 1] == 'S' && a[i + 1][j - 1] == 'M'))
                         {
                             result++;
                         }
@@ -56,10 +56,10 @@ public class UnitTest1
         return result;
     }
 
-    private static int Part1(char[,] a)
+    private static int Part1(string[] a)
     {
-        var l1 = a.GetLength(0);
-        var l2 = a.GetLength(1);
+        var l1 = a.Length;
+        var l2 = a[0].Length;
         var result = 0;
         var word = "XMAS";
         for (var i = 0; i < l1; i++)
@@ -81,10 +81,10 @@ public class UnitTest1
     private static readonly (int, int)[] RightDiagonalDirections = [(-1, 1), (1, -1)];
     private static readonly (int, int)[] LeftDiagonalDirections = [(-1, -1), (1, 1)];
 
-    private static int Dfs(char[,] a, string word, int pos, int l1, int l2, (int, int)[] directions, int i, int j)
+    private static int Dfs(string[] a, string word, int pos, int l1, int l2, (int, int)[] directions, int i, int j)
     {
         if (i < 0 || j < 0 || i >= l1 || j >= l2) return 0;
-        char candidate = a[i, j];
+        char candidate = a[i][j];
         char c = word[pos];
         if (c != candidate) return 0;
 
@@ -98,21 +98,8 @@ public class UnitTest1
         return result;
     }
 
-    private static char[,] Get2DArray(string Sample)
+    private static string[] GetData(string Sample)
     {
-        var content = File.ReadAllLines(Sample);
-
-        int l1 = content.Length;
-        int l2 = content[0].Length;
-        var map = new char[l1, l2];
-
-        for (var i = 0; i < l1; i++)
-        {
-            for (var j = 0; j < l2; j++)
-            {
-                map[i, j] = content[i][j];
-            }
-        }
-        return map;
+        return File.ReadAllLines(Sample);
     }
 }
