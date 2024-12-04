@@ -29,7 +29,7 @@ public class UnitTest1
     public void TestPart2Input()
     {
         var a = Get2DArray("../../../input.txt");
-        Assert.Equal(1910, Part2(a)); // not 1831, 1993
+        Assert.Equal(1910, Part2(a));
     }
     private static int Part2(char[,] a)
     {
