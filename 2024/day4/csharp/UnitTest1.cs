@@ -101,8 +101,8 @@ public class UnitTest1
         return result;
     }
 
-    private static string[] GetData(string Sample)
+    private static string[] GetData(string filePath)
     {
-        return File.ReadAllLines(Sample);
+        return File.ReadAllLines(filePath);
     }
 }
