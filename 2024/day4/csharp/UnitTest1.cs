@@ -42,9 +42,13 @@ public class UnitTest1
             {
                 if (a[i][j] == 'A')
                 {
-                    if ((a[i - 1][j - 1] == 'M' && a[i + 1][j + 1] == 'S') || (a[i - 1][j - 1] == 'S' && a[i + 1][j + 1] == 'M'))
+                    char upperLeft = a[i - 1][j - 1];
+                    char bottomRight = a[i + 1][j + 1];
+                    if (upperLeft == 'M' && bottomRight == 'S' || upperLeft == 'S' && bottomRight == 'M')
                     {
-                        if ((a[i - 1][j + 1] == 'M' && a[i + 1][j - 1] == 'S') || (a[i - 1][j + 1] == 'S' && a[i + 1][j - 1] == 'M'))
+                        char upperRight = a[i - 1][j + 1];
+                        char bottomLeft = a[i + 1][j - 1];
+                        if (upperRight == 'M' && bottomLeft == 'S' || upperRight == 'S' && a[i + 1][j - 1] == 'M')
                         {
                             result++;
                         }
@@ -62,24 +66,23 @@ public class UnitTest1
         var l2 = a[0].Length;
         var result = 0;
         var word = "XMAS";
+        (int, int)[] horizontalDirections = [(0, -1), (0, 1)];
+        (int, int)[] verticalDirections = [(1, 0), (-1, 0)];
+        (int, int)[] rightDiagonalDirections = [(-1, 1), (1, -1)];
+        (int, int)[] leftDiagonalDirections = [(-1, -1), (1, 1)];
         for (var i = 0; i < l1; i++)
         {
             for (var j = 0; j < l2; j++)
             {
-                result += Dfs(a, word, 0, l1, l2, HorizontalDirections, i, j);
-                result += Dfs(a, word, 0, l1, l2, VerticalDirections, i, j);
-                result += Dfs(a, word, 0, l1, l2, RightDiagonalDirections, i, j);
-                result += Dfs(a, word, 0, l1, l2, LeftDiagonalDirections, i, j);
+                result += Dfs(a, word, 0, l1, l2, horizontalDirections, i, j);
+                result += Dfs(a, word, 0, l1, l2, verticalDirections, i, j);
+                result += Dfs(a, word, 0, l1, l2, rightDiagonalDirections, i, j);
+                result += Dfs(a, word, 0, l1, l2, leftDiagonalDirections, i, j);
             }
         }
 
         return result;
     }
-
-    private static readonly (int, int)[] HorizontalDirections = [(0, -1), (0, 1)];
-    private static readonly (int, int)[] VerticalDirections = [(1, 0), (-1, 0)];
-    private static readonly (int, int)[] RightDiagonalDirections = [(-1, 1), (1, -1)];
-    private static readonly (int, int)[] LeftDiagonalDirections = [(-1, -1), (1, 1)];
 
     private static int Dfs(string[] a, string word, int pos, int l1, int l2, (int, int)[] directions, int i, int j)
     {
