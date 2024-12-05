@@ -48,7 +48,7 @@ public class UnitTest1
                     {
                         char upperRight = a[i - 1][j + 1];
                         char bottomLeft = a[i + 1][j - 1];
-                        if (upperRight == 'M' && bottomLeft == 'S' || upperRight == 'S' && a[i + 1][j - 1] == 'M')
+                        if (upperRight == 'M' && bottomLeft == 'S' || upperRight == 'S' && bottomLeft == 'M')
                         {
                             result++;
                         }
