@@ -13,6 +13,7 @@ let parse (x:string) =
     | other -> failwithf "unexpected input '%A'" other
 
 let part1 (pageOrderingRules, updates) = 
+    // O(n)
     let rec updateAll pageOrderingRules updates =
             let rec isValid = 
                 function
@@ -22,6 +23,7 @@ let part1 (pageOrderingRules, updates) =
                     if not r then false
                     else isValid t
             updates |> Array.filter (Array.toList >> isValid)
+    // O(1)
     let getMiddle a = 
         let l = a |> Array.length
         if l % 2 = 0 then failwithf "unexpected even length '%i'" l
@@ -46,18 +48,21 @@ let part2 (pageOrderingRules, updates) =
     let rec updateAll updates = updates |> Array.filter (Array.toList >> (isValid >> not))
 
     let fix updates = 
+        // O(n) this one is useless and can be merged with fix to save one degree
         let rec isValid x update = 
             match update with
             | [] -> true
             | h::t -> 
                 if h = x || pageOrderingRules |> Set.contains (x,h) then isValid x t
                 else false
+        // O(n^2)
         let rec findHead update =
             function
             | [] -> failwith "findFirst: unexpected empty list"
             | h::t -> 
                 if isValid h update then h
                 else findHead update t
+        // O(n^3)
         let fix = 
             let rec fix current =
                 function
@@ -68,6 +73,7 @@ let part2 (pageOrderingRules, updates) =
                     fix (head::current) update
             fix []
 
+        // O(m*n^3)
         updates |> Array.toList |> fix
 
     let getMiddle a = 
