@@ -13,7 +13,7 @@ public class UnitTest1
                 if (map[i, j] == c) return (i, j);
             }
         }
-        throw new ArgumentException("map does not contains char");
+        throw new ArgumentException($"map does not contains '{c}'");
     }
 
     private static char TurnRight(char c) => c switch
@@ -130,7 +130,7 @@ public class UnitTest1
         Assert.Equal(5551, Part1("../../../../input.txt"));
     }
 
-    [Fact(Timeout = 300000000)]
+    [Fact]
     public void TestPart2EachSample()
     {
         var filePath = "../../../../sample.txt";
@@ -152,13 +152,13 @@ public class UnitTest1
         return HasCycle(map2, [], map2[x, y], x, y);
     }
 
-    [Fact(Timeout = 300000000)]
+    [Fact]
     public void TestPart2Sample()
     {
         Assert.Equal(6, Part2("../../../../sample.txt"));
     }
 
-    [Fact(Timeout = 300000000)]
+    [Fact]
     public void TestPart2Input()
     {
         Assert.Equal(1939, Part2("../../../../input.txt"));
