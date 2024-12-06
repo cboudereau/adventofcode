@@ -55,9 +55,9 @@ public class UnitTest1
             var i2 = i + x;
             var j2 = j + y;
 
-            var node = ((i, j), (i2, j2));
-            if (visited.Contains(node)) return true;
-            visited.Add(node);
+            var edge = ((i, j), (i2, j2));
+            if (visited.Contains(edge)) return true;
+            visited.Add(edge);
 
             if (IsOutside(i2, j2, l1, l2))
             {
