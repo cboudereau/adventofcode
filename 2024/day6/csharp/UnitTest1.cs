@@ -39,37 +39,7 @@ public class UnitTest1
         return i < 0 || j < 0 || i >= l1 || j >= l2;
     }
 
-    internal static bool Visit(char[,] map, HashSet<((int, int), (int, int))> visited, char direction, int i, int j)
-    {
-        var l1 = map.GetLength(0);
-        var l2 = map.GetLength(1);
-
-        if (IsOutside(i, j, l1, l2)) return false;
-        var (x, y) = Move(direction);
-        var i2 = i + x;
-        var j2 = j + y;
-
-        if (IsOutside(i2, j2, l1, l2))
-        {
-            map[i, j] = 'X';
-            return false;
-        }
-        // var node = ((i,j), (i2, j2));
-        // if (visited.Contains(node)) return true;
-        // visited.Add(node);
-
-        if (map[i2, j2] == '#')
-        {
-            var d = TurnRight(direction);
-            map[i, j] = 'X';
-            return Visit(map, visited, d, i, j);
-        }
-        map[i, j] = 'X';
-        map[i2, j2] = direction;
-        return Visit(map, visited, direction, i2, j2);
-    }
-
-    internal static bool Visit3(char[,] map, HashSet<((int, int), (int, int))> visited, char dir, int a, int b)
+    internal static bool HasCycle(char[,] map, HashSet<((int, int), (int, int))> visited, char dir, int a, int b)
     {
         var stack = new Stack<(char, int, int)>();
         stack.Push((dir, a, b));
@@ -130,7 +100,7 @@ public class UnitTest1
     {
         char[,] map = GetMap(filePath);
         var (i, j) = GetPos(map, '^');
-        Visit3(map, [], map[i, j], i, j);
+        HasCycle(map, [], map[i, j], i, j);
 
         return GetVisitedCount(map);
     }
@@ -179,7 +149,7 @@ public class UnitTest1
     {
         var map2 = GetMap(filePath);
         map2[i, j] = '#';
-        return Visit3(map2, [], map2[x, y], x, y);
+        return HasCycle(map2, [], map2[x, y], x, y);
     }
 
     [Fact(Timeout = 300000000)]
@@ -189,12 +159,10 @@ public class UnitTest1
     }
 
     [Fact(Timeout = 300000000)]
-    // 16086 : too high
     public void TestPart2Input()
     {
         Assert.Equal(1939, Part2("../../../../input.txt"));
     }
-
 
     internal static int Part2(string filePath)
     {
@@ -210,7 +178,7 @@ public class UnitTest1
                 {
                     var map2 = GetMap(filePath);
                     map2[i, j] = '#';
-                    if (Visit3(map2, [], map2[x, y], x, y)) result++;
+                    if (HasCycle(map2, [], map2[x, y], x, y)) result++;
                 }
             }
         }
