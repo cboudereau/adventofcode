@@ -8,7 +8,7 @@ public class UnitTest1
     public void TestPart1()
     {
         Assert.Equal(1928, Part1("2333133121414131402"));
-        Assert.Equal(6225730762521, Part1(File.ReadAllText("../../../../input.txt")));
+        Assert.Equal(6301895872542, Part1(File.ReadAllText("../../../../input.txt")));
     }
 
     private static long Part1(string input)
@@ -73,21 +73,19 @@ public class UnitTest1
     public void TestPart2()
     {
         Assert.Equal(2858, Part2("2333133121414131402"));
-        //6250606043917: too high
-        Assert.Equal(6250606043917, Part2(File.ReadAllText("../../../../input.txt")));
+        Assert.Equal(6323761685944, Part2(File.ReadAllText("../../../../input.txt")));
     }
 
     private static long Part2(string input)
     {
         var compacted = new Dictionary<int, List<(int, int)>>();
         var toIgnore = new HashSet<int>();
-        var leftPointer = 1;
         var counts = new Dictionary<int, int>();
 
         for (var right = input.Length - 1; right >= 0; right -= 2)
         {
             var candidate = input[right] - '0';
-            for (var i = 1; i < right - 1; i += 2)
+            for (var i = 1; i < right; i += 2)
             {
                 var space = input[i] - '0';
                 counts.TryGetValue(i, out var count);
@@ -100,7 +98,6 @@ public class UnitTest1
                     {
                         compacted[i].Add(entry);
                     }
-                    leftPointer += 2;
                     toIgnore.Add(right);
                     break;
                 }
@@ -111,13 +108,12 @@ public class UnitTest1
 
         for (var i = 0; i < input.Length; i++)
         {
-            var fileId = i / 2;
             var length = input[i] - '0';
             if (i % 2 == 0)
             {
                 for (var j = 0; j < length; j++)
                 {
-                    if (!toIgnore.Contains(i)) result.Add(fileId);
+                    if (!toIgnore.Contains(i)) result.Add(i/2);
                     else result.Add(null);
                 }
             }
