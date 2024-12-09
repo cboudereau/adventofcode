@@ -113,7 +113,7 @@ public class UnitTest1
             {
                 for (var j = 0; j < length; j++)
                 {
-                    if (!toIgnore.Contains(i)) result.Add(i/2);
+                    if (!toIgnore.Contains(i)) result.Add(i / 2);
                     else result.Add(null);
                 }
             }
