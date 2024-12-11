@@ -22,6 +22,7 @@ public class UnitTest1
     {
         Assert.Equal((10, 10), Split(1010));
         Assert.Equal((9, 9), Split(99));
+        Assert.Throws<ArgumentException>(() => Split(1));
     }
 
     [Fact]
@@ -70,6 +71,7 @@ public class UnitTest1
             cache.TryAdd((left, times), leftCount);
             var rightCount = Solve(cache, right, times);
             cache.TryAdd((right, times), rightCount);
+
             return leftCount + rightCount;
         }
         {
