@@ -57,8 +57,9 @@ public class UnitTest1
         times--;
         if (n == 0)
         {
-            var r = Solve(cache, 1, times);
-            cache.TryAdd((1, times), r);
+            n = 1;
+            var r = Solve(cache, n, times);
+            cache.TryAdd((n, times), r);
             return r;
         }
         var digits = GetNumberOfDigits(n);
