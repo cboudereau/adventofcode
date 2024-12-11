@@ -73,9 +73,9 @@ public class UnitTest1
             return leftCount + rightCount;
         }
         {
-            var v = n * 2024;
-            var r = Solve(cache, v, times);
-            cache.TryAdd((v, times), r);
+            n *= 2024;
+            var r = Solve(cache, n, times);
+            cache.TryAdd((n, times), r);
             return r;
         }
     }
