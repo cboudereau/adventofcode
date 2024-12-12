@@ -117,4 +117,55 @@ MMMISSJEEE".Split(Environment.NewLine)));
 
         Assert.Equal(1396298, Part1(File.ReadAllLines("../../../../input.txt")));
     }
+
+    private static long Part2(string[] input)
+    {
+        long result = 0;
+        foreach (var (plant, area, _, region) in GetRegions(input))
+        {
+            result += area * CountSides(region);
+        }
+        return result;
+    }
+
+    private static long CountSides(List<(int, int)> region)
+    {
+        var sides = 0;
+        var map = new HashSet<(int, int)>(region);
+        foreach (var (i, j) in region)
+        {
+            var corners = new[] {
+                ((i, j - 1), (i - 1, j), (i - 1, j - 1)),
+                ((i - 1, j), (i, j + 1), (i - 1, j + 1)),
+                ((i, j + 1), (i + 1, j), (i + 1, j + 1)),
+                ((i + 1, j), (i, j - 1), (i + 1, j - 1)),
+            }.Where(points =>
+            {
+                var (p1, p2, p3) = points;
+                var isClosedCorner = !map.Contains(p1) && !map.Contains(p2);
+                var isOpenedCorner = map.Contains(p1) && map.Contains(p2) && !map.Contains(p3);
+                return isClosedCorner || isOpenedCorner;
+            }).Count();
+
+            sides += corners;
+        }
+        return sides;
+    }
+    [Fact]
+    public void TestPart2()
+    {
+        Assert.Equal(1206, Part2(@"RRRRIICCFF
+RRRRIICCCF
+VVRRRCCFFF
+VVRCCCJFFF
+VVVVCJJCFE
+VVIVCCJJEE
+VVIIICJJEE
+MIIIIIJJEE
+MIIISIJEEE
+MMMISSJEEE".Split(Environment.NewLine)));
+
+        Assert.Equal(853588, Part2(File.ReadAllLines("../../../../input.txt")));
+    }
+
 }
