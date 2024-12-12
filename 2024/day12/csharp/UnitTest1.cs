@@ -57,7 +57,7 @@ EEEC".Split(Environment.NewLine));
         while (queue.Count > 0)
         {
             var (i, j) = queue.Dequeue();
-            if (!visited.Add((i, j)) || input[i][j] != plant) continue;
+            if (!visited.Add((i, j))) continue;
             var perimeter = 0;
             foreach (var (x, y) in directions)
             {
