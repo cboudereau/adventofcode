@@ -26,9 +26,9 @@ public class UnitTest1
         var (xp, yp) = prize;
         var (xa, ya) = a;
         var (xb, yb) = b;
-        var d = xa * yb - ya * xb;
-        var ta = (xp * yb - yp * xb) / d;
-        var tb = (yp * xa - xp * ya) / d;
+
+        var tb = (yp * xa - xp * ya) / (xa * yb - ya * xb);
+        var ta = (xp - xb * tb) / xa;
         if (ta * xa + tb * xb == xp && ta * ya + tb * yb == yp) return 3 * ta + tb;
         return null;
     }
