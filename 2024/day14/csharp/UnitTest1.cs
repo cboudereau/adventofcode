@@ -136,7 +136,7 @@ public class UnitTest1
         var times = 0;
         var sb = new StringBuilder();
         var output = "";
-        while (!output.Contains("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"))
+        while (!output.Contains("XXXXXXXXX"))
         {
             times++;
             sb.Clear();
@@ -157,7 +157,6 @@ public class UnitTest1
                 }
                 sb.AppendLine();
             }
-
             output = sb.ToString();
         }
 
