@@ -97,7 +97,6 @@ public class Solution
 
         Solve(map, visited, [((start, right), ([], 0))]);
 
-        // End part
         var end = e.Value;
         var minDistance = long.MaxValue;
         HashSet<(int, int)> paths = [];
