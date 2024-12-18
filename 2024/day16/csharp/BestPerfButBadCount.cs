@@ -1,0 +1,135 @@
+namespace csharp;
+
+public class BestPerfButBadCount
+{
+    private static (int, int)? FindChar(string[] map, char c)
+    {
+        for (var i = 0; i < map.Length; i++)
+        {
+            for (var j = 0; j < map[0].Length; j++)
+            {
+                if (map[i][j] == c) return (i, j);
+            }
+        }
+        return null;
+    }
+
+    private static long GetValue((long, HashSet<(int, int)>) v)
+    {
+        var (d, _) = v;
+        return d;
+    }
+
+    [Fact]
+    public void TestPart1()
+    {
+        Assert.Equal(7036, GetValue(Part1(File.ReadAllLines("../../../../sample.txt"))));
+        Assert.Equal(11048, GetValue(Part1(File.ReadAllLines("../../../../sample2.txt"))));
+        Assert.Equal(85432, GetValue(Part1(File.ReadAllLines("../../../../input.txt"))));
+
+        // Assert.Equal((7036, 45), GetValue(Part1(File.ReadAllLines("../../../../sample.txt"))));
+        // Assert.Equal((11048, 64), GetValue(Part1(File.ReadAllLines("../../../../sample2.txt"))));
+        // Assert.Equal((85432, 465), GetValue(Part1(File.ReadAllLines("../../../../input.txt"))));
+    }
+    private static (int, int) TurnClockwise((int, int) direction)
+    {
+        return direction switch
+        {
+            (0, 1) => (1, 0),
+            (1, 0) => (0, -1),
+            (0, -1) => (-1, 0),
+            (-1, 0) => (0, 1),
+            _ => throw new ArgumentException("unexpected direction"),
+        };
+    }
+
+    private static (long, HashSet<(int, int)>) Part1(string[] map)
+    {
+        (int, int)? e = FindChar(map, 'E');
+        if (!e.HasValue) throw new ArgumentException("cannot find End 'E'");
+        var s = FindChar(map, 'S');
+        if (!s.HasValue) throw new ArgumentException("cannot find End 'S'");
+        var start = s.Value;
+
+        var distances = new Dictionary<(int, int), Dictionary<(int, int), (HashSet<(int, int)>, long)>>();
+        var queue = new Queue<(long, (int, int), HashSet<(int, int)>, (int, int))>();
+        var right = (0, 1);
+        queue.Enqueue((0, right, [start], start));
+
+        while (queue.Count > 0)
+        {
+            var (distance, direction, path, (i, j)) = queue.Dequeue();
+            if (i < 0 || j < 0 || i >= map.Length || j >= map[0].Length || map[i][j] == '#') continue;
+
+            bool canContinue;
+            if (distances.TryAdd((i, j), new Dictionary<(int, int), (HashSet<(int, int)>, long)> { { direction, (path, distance) } }))
+            {
+                canContinue = true;
+            }
+            else if (distances[(i, j)].TryGetValue(direction, out var oldValue))
+            {
+                var (oldPath, oldDistance) = oldValue;
+                if (distance == oldDistance)
+                {
+                    distances[(i, j)][direction] = ([.. oldPath, .. path], distance);
+                }
+                else
+                {
+                    distances[(i, j)][direction] = (path, distance);
+                }
+                canContinue = distance < oldDistance;
+            }
+            else
+            {
+                distances[(i, j)].Add(direction, (path, distance));
+                canContinue = true;
+            }
+
+            if (canContinue)
+            {
+                {
+                    var (oi, oj) = direction;
+                    var i2 = i + oi;
+                    var j2 = j + oj;
+                    queue.Enqueue((distance + 1, direction, [.. path, (i2, j2)], (i2, j2)));
+                }
+
+                {
+                    var (oi, oj) = TurnClockwise(direction);
+                    var i2 = i + oi;
+                    var j2 = j + oj;
+                    queue.Enqueue((distance + 1001, (oi, oj), [.. path, (i2, j2)], (i2, j2)));
+                }
+
+                {
+                    var (oi, oj) = TurnClockwise(TurnClockwise(TurnClockwise(direction)));
+                    var i2 = i + oi;
+                    var j2 = j + oj;
+                    queue.Enqueue((distance + 1001, (oi, oj), [.. path, (i2, j2)], (i2, j2)));
+                }
+            }
+        }
+        var end = e.Value;
+        var minDistance = long.MaxValue;
+        var endDistances = distances[end];
+        foreach (var endDistance in endDistances)
+        {
+            var (_, v) = endDistance.Value;
+            if (v < minDistance)
+            {
+                minDistance = v;
+            }
+        }
+
+        HashSet<(int, int)> allTiles = [];
+        foreach (var endDistance in endDistances)
+        {
+            var (p, v) = endDistance.Value;
+            if (v == minDistance)
+            {
+                allTiles = [.. allTiles, .. p];
+            }
+        }
+        return (minDistance, allTiles);
+    }
+}
