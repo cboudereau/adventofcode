@@ -70,7 +70,7 @@ public class Solution
             {
                 var (oldPath, oldDistance) = oldPathAndDistance;
                 if (distance == oldDistance) distances[position] = ([.. oldPath, .. path], distance);
-                else distances[position] = (path, distance);
+                else if (distance < oldDistance) distances[position] = (path, distance);
             }
             else distances.Add(position, (path, distance));
         }
@@ -100,14 +100,17 @@ public class Solution
         var end = e.Value;
         var minDistance = long.MaxValue;
         HashSet<(int, int)> paths = [];
-        foreach (var entry in visited)
+        (int, int)[] directions = [(-1, 0), (0, 1), (1, 0), (-1, 0)];
+        foreach (var direction in directions)
         {
-            var (pos, _) = entry.Key;
-            var (p, d) = entry.Value;
-            if (pos == end && d < minDistance)
+            if (visited.TryGetValue((end, direction), out var pathAndDistance))
             {
-                minDistance = d;
-                paths = p;
+                var (p, d) = pathAndDistance;
+                if (d <= minDistance)
+                {
+                    minDistance = d;
+                    paths = p;
+                }
             }
         }
         return (minDistance, paths);
