@@ -14,18 +14,18 @@ public class BestPerfButBadCount
         return null;
     }
 
-    private static long GetValue((long, HashSet<(int, int)>) v)
+    private static (long, int) GetValue((long, HashSet<(int, int)>) v)
     {
-        var (d, _) = v;
-        return d;
+        var (d, p) = v;
+        return (d, p.Count);
     }
 
     [Fact]
     public void TestPart1()
     {
-        Assert.Equal(7036, GetValue(Part1(File.ReadAllLines("../../../../sample.txt"))));
-        Assert.Equal(11048, GetValue(Part1(File.ReadAllLines("../../../../sample2.txt"))));
-        Assert.Equal(85432, GetValue(Part1(File.ReadAllLines("../../../../input.txt"))));
+        Assert.Equal((7036, 37), GetValue(Part1(File.ReadAllLines("../../../../sample.txt"))));
+        Assert.Equal((11048, 49), GetValue(Part1(File.ReadAllLines("../../../../sample2.txt"))));
+        Assert.Equal((85432, 433), GetValue(Part1(File.ReadAllLines("../../../../input.txt"))));
 
         // Assert.Equal((7036, 45), GetValue(Part1(File.ReadAllLines("../../../../sample.txt"))));
         // Assert.Equal((11048, 64), GetValue(Part1(File.ReadAllLines("../../../../sample2.txt"))));
@@ -51,7 +51,7 @@ public class BestPerfButBadCount
         if (!s.HasValue) throw new ArgumentException("cannot find End 'S'");
         var start = s.Value;
 
-        var distances = new Dictionary<(int, int), Dictionary<(int, int), (HashSet<(int, int)>, long)>>();
+        var distances = new Dictionary<((int, int), (int, int)), (HashSet<(int, int)>, long)>();
         var queue = new Queue<(long, (int, int), HashSet<(int, int)>, (int, int))>();
         var right = (0, 1);
         queue.Enqueue((0, right, [start], start));
@@ -60,29 +60,24 @@ public class BestPerfButBadCount
         {
             var (distance, direction, path, (i, j)) = queue.Dequeue();
             if (i < 0 || j < 0 || i >= map.Length || j >= map[0].Length || map[i][j] == '#') continue;
-
+            var position = ((i, j), direction);
             bool canContinue;
-            if (distances.TryAdd((i, j), new Dictionary<(int, int), (HashSet<(int, int)>, long)> { { direction, (path, distance) } }))
+            if (distances.TryAdd(position, (path, distance)))
             {
                 canContinue = true;
-            }
-            else if (distances[(i, j)].TryGetValue(direction, out var oldValue))
-            {
-                var (oldPath, oldDistance) = oldValue;
-                if (distance == oldDistance)
-                {
-                    distances[(i, j)][direction] = ([.. oldPath, .. path], distance);
-                }
-                else
-                {
-                    distances[(i, j)][direction] = (path, distance);
-                }
-                canContinue = distance < oldDistance;
             }
             else
             {
-                distances[(i, j)].Add(direction, (path, distance));
-                canContinue = true;
+                var (oldPath, oldDistance) = distances[position];
+                if (distance == oldDistance)
+                {
+                    distances[position] = ([.. oldPath, .. path], distance);
+                }
+                else
+                {
+                    distances[position] = (path, distance);
+                }
+                canContinue = distance < oldDistance;
             }
 
             if (canContinue)
@@ -111,23 +106,30 @@ public class BestPerfButBadCount
         }
         var end = e.Value;
         var minDistance = long.MaxValue;
-        var endDistances = distances[end];
-        foreach (var endDistance in endDistances)
+        foreach (var distance in distances)
         {
-            var (_, v) = endDistance.Value;
-            if (v < minDistance)
+            var (d, _) = distance.Key;
+            if (d == end)
             {
-                minDistance = v;
+                var (_, v) = distance.Value;
+                if (v < minDistance)
+                {
+                    minDistance = v;
+                }
             }
         }
 
         HashSet<(int, int)> allTiles = [];
-        foreach (var endDistance in endDistances)
+        foreach (var distance in distances)
         {
-            var (p, v) = endDistance.Value;
-            if (v == minDistance)
+            var (d, _) = distance.Key;
+            if (d == end)
             {
-                allTiles = [.. allTiles, .. p];
+                var (p, v) = distance.Value;
+                if (v == minDistance)
+                {
+                    allTiles = [.. allTiles, .. p];
+                }
             }
         }
         return (minDistance, allTiles);
